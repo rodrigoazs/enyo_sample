@@ -78,14 +78,41 @@ enyo.kind({
 		return true;
 	},
 	lastfmTap: function() {
+		var request = new enyo.Ajax({url: "http://ws.audioscrobbler.com/2.0/?method=user.gettopartists&limit=10&user="+this.storage.lastfm_user+"&api_key=2b35547bd5675d8ecb2b911ee9901f59&format=json"});
+		request.response(this, function(inSender, inData) {
+			this.lastfm_list = inData;
+			data = this.lastfm_list;
+			//alert(data.topartists.artist[0].name);
+		});
+		request.go();
+		alert(this.lastfm_list.topartists.artist[0].name);
 		this.$.panels.pushPanels([
 			{title: "<img src='http://perfectprog.com/pics/lastfm/lastfm-icon.png' width='50px'> LastFM", titleUpperCase: false, allowHtmlHeader: true, autoNumber: false, smallHeader: true, headerType: 'small', defaultSpotlightControl: "defaultControl", classes: "moon-7h", joinToPrev: true,
 			headerComponents: [
 							{kind: "moon.Button", small:true, content: $L("Settings"), name:"mediumHeaderToggle", ontap: "lastfmConfigTap"}
+			],
+			components: [
+				{kind: 'moon.Scroller', classes: "enyo-fill", components: [
+					{kind: "enyo.Repeater", count:"5", onSetupItem: "setLastFMArtistList", components: [
+						{
+									kind: "moon.ImageItem",
+									source: enyo.Image.placeholder,
+									label: "Breaking Bad",
+									text: "A struggling high school chemistry teacher who is diagnosed with inoperable lung cancer turns to a life of crime, producing and selling methamphetamine with a former student"
+						}
+					]}
+				]}
 			]
 			}
 		],{owner: this});
 	},
+	setLastFMArtistList: function(inSender, inEvent) {
+        var index = inEvent.index;
+        var item = inEvent.item;
+				item.$.imageItem.set("label", this.lastfm_list.topartists.artist[index].name);
+				item.$.imageItem.set("source", this.lastfm_list.topartists.artist[index].image[2]['#text']);
+        return true;
+  },
 	googlemapsTap: function() {
 		this.$.panels.pushPanels([
 			{title: "<img src='http://www.juliesalva.com/wp-content/uploads/2015/03/Google_Maps_Icon.png' width='50px'> GoogleMaps", titleUpperCase: false, allowHtmlHeader: true, autoNumber: false, smallHeader: true, headerType: 'small', defaultSpotlightControl: "defaultControl", classes: "moon-7h", joinToPrev: true,
