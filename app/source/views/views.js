@@ -38,8 +38,9 @@ enyo.kind({
 		this.$.panels.pushPanels([
 			{title: "Menu", autoNumber: false, smallHeader: true, headerType: 'small', name: "MenuPanel", defaultSpotlightControl: "defaultControl", classes: "moon-7h", joinToPrev: true, components: [
 				{kind: "moon.Item", name: "FlickrSearchItem", content: $L('Flickr Search'), ontap: "next1"},
-				{kind: "moon.Item", name: "SettingsItem",  content: "<img src='http://icons.iconarchive.com/icons/graphicloads/100-flat-2/256/settings-icon.png' width='20px'> "+$L('Settings'), allowHtml: true, ontap: "next2"},
-				{kind: "moon.Item", name: "LastFMItem",  content: "<img src='http://perfectprog.com/pics/lastfm/lastfm-icon.png' width='20px'> LastFM", allowHtml: true, ontap: "lastfmTap"}
+				{kind: "moon.Item", name: "LastFMItem",  content: "<img src='http://perfectprog.com/pics/lastfm/lastfm-icon.png' width='20px'> LastFM", allowHtml: true, ontap: "lastfmTap"},
+				{kind: "moon.Item", name: "GoogleMapsItem",  content: "<img src='http://www.juliesalva.com/wp-content/uploads/2015/03/Google_Maps_Icon.png' width='20px'> GoogleMaps", allowHtml: true, ontap: "googlemapsTap"},
+				{kind: "moon.Item", name: "SettingsItem",  content: "<img src='http://icons.iconarchive.com/icons/graphicloads/100-flat-2/256/settings-icon.png' width='20px'> "+$L('Settings'), allowHtml: true, ontap: "next2"}
 			]}
 		], {owner: this});
 	},
@@ -85,6 +86,30 @@ enyo.kind({
 			}
 		],{owner: this});
 	},
+	googlemapsTap: function() {
+		this.$.panels.pushPanels([
+			{title: "<img src='http://www.juliesalva.com/wp-content/uploads/2015/03/Google_Maps_Icon.png' width='50px'> GoogleMaps", titleUpperCase: false, allowHtmlHeader: true, autoNumber: false, smallHeader: true, headerType: 'small', defaultSpotlightControl: "defaultControl", classes: "moon-7h", joinToPrev: true,
+			components: [
+				{kind: "moon.InputDecorator", components: [
+					{kind: "moon.Input", placeholder: "Search term", onchange:"googlemaphandleInput"},
+					{kind: "Image", src: "$lib/moonstone/samples/assets/search-input-search.png"}
+				]},
+				{tag: "br"},
+				{kind: "moon.IconButton", icon: "arrowlargeleft", ontap: "googlemapsbuttonTapped"},
+				{kind: "moon.IconButton", icon: "arrowlargeright", ontap: "googlemapsbuttonTapped"},
+				{kind: "moon.IconButton", icon: "arrowlargeup", ontap: "googlemapsbuttonTapped"},
+				{kind: "moon.IconButton", icon: "arrowlargedown", ontap: "googlemapsbuttonTapped"},
+				{kind: "moon.IconButton", icon: "fullscreen", ontap: "googlemapsbuttonTapped"},
+				{kind: "moon.IconButton", icon: "exitfullscreen", ontap: "googlemapsbuttonTapped"},
+				{tag: "br"},{tag: "br"},
+				{tag: "div", id: "map", style: "width: 100%; height: 100%; align: center;"}
+			]
+			}
+		],{owner: this});
+		var mapDiv = document.getElementById('map');
+    this.map = new google.maps.Map(mapDiv, { center: {lat: 44.540, lng: -78.546}, zoom: 8 });
+		//map.setZoom(2);
+	},
 	writeStorage: function(params)
 	{
     var request = new enyo.Ajax({url: '../storage/index.php', method: "POST", postBody: params });
@@ -99,7 +124,7 @@ enyo.kind({
 		this.$.panels.pushPanels([
 			{title: $L("Settings"), titleUpperCase: false, allowHtmlHeader: true, autoNumber: false, smallHeader: true, headerType: 'small', defaultSpotlightControl: "defaultControl", classes: "moon-7h", joinToPrev: true,
 			components: [
-				{kind: "moon.BodyText", content: "Please, type your LastFM username to obtain the data."},
+				{kind: "moon.BodyText", content: "Please, type your LastFM username to establish connection."},
 				{kind: "moon.InputDecorator", components: [
 					{kind: "moon.Input", name: "lastfmUserInput", placeholder: $L("Enter username"), value: this.storage.lastfm_user, oninput:"handleInput", onchange:"handleChange"}
 				]},
@@ -157,5 +182,32 @@ enyo.kind({
 
 		});
 		request.go();
+	},
+	googlemapsbuttonTapped: function(inSender, inEvent){
+		switch(inSender.get("icon")) {
+			case "arrowlargeup":
+				offsetCenter(this.map, this.map.getCenter(), 0, -20);
+				break;
+			case "arrowlargedown":
+				offsetCenter(this.map, this.map.getCenter(), 0, 20);
+				break;
+			case "arrowlargeleft":
+				offsetCenter(this.map, this.map.getCenter(), 20, 0);
+				break;
+			case "arrowlargeright":
+				offsetCenter(this.map, this.map.getCenter(), -20, 0);
+				break;
+			case "fullscreen":
+				this.map.setZoom(this.map.getZoom()-1);
+				break;
+			case "exitfullscreen":
+				this.map.setZoom(this.map.getZoom()+1);
+				break;
+			default:
+			break;
+		}
+	},
+	googlemaphandleInput: function(inSender, inEvent) {
+		localizeAddres(this.map, inSender.getValue());
 	}
 });
