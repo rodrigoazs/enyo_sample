@@ -82,29 +82,32 @@ enyo.kind({
 		request.response(this, function(inSender, inData) {
 			this.lastfm_list = inData;
 			data = this.lastfm_list;
+			//this.$.LastFMPanel.data = this.lastfm_list;
 			//alert(data.topartists.artist[0].name);
+			this.$.panels.pushPanels([
+				{name: "LastFMPanel", title: "<img src='http://perfectprog.com/pics/lastfm/lastfm-icon.png' width='50px'> LastFM", titleUpperCase: false, allowHtmlHeader: true, autoNumber: false, smallHeader: true, headerType: 'small', defaultSpotlightControl: "defaultControl", classes: "moon-7h", joinToPrev: true,
+				data: null,
+				headerComponents: [
+								{kind: "moon.Button", small:true, content: $L("Settings"), name:"mediumHeaderToggle", ontap: "lastfmConfigTap"}
+				],
+				components: [
+					{kind: 'moon.Scroller', classes: "enyo-fill", components: [
+						{kind: "enyo.Repeater", count:"10", onSetupItem: "setLastFMArtistList", components: [
+							{
+										kind: "moon.ImageItem",
+										source: enyo.Image.placeholder,
+										label: "Breaking Bad",
+										text: "A struggling high school chemistry teacher who is diagnosed with inoperable lung cancer turns to a life of crime, producing and selling methamphetamine with a former student"
+							}
+						]}
+					]}
+				]
+				}
+			],{owner: this});
 		});
 		request.go();
-		alert(this.lastfm_list.topartists.artist[0].name);
-		this.$.panels.pushPanels([
-			{title: "<img src='http://perfectprog.com/pics/lastfm/lastfm-icon.png' width='50px'> LastFM", titleUpperCase: false, allowHtmlHeader: true, autoNumber: false, smallHeader: true, headerType: 'small', defaultSpotlightControl: "defaultControl", classes: "moon-7h", joinToPrev: true,
-			headerComponents: [
-							{kind: "moon.Button", small:true, content: $L("Settings"), name:"mediumHeaderToggle", ontap: "lastfmConfigTap"}
-			],
-			components: [
-				{kind: 'moon.Scroller', classes: "enyo-fill", components: [
-					{kind: "enyo.Repeater", count:"5", onSetupItem: "setLastFMArtistList", components: [
-						{
-									kind: "moon.ImageItem",
-									source: enyo.Image.placeholder,
-									label: "Breaking Bad",
-									text: "A struggling high school chemistry teacher who is diagnosed with inoperable lung cancer turns to a life of crime, producing and selling methamphetamine with a former student"
-						}
-					]}
-				]}
-			]
-			}
-		],{owner: this});
+		//alert(this.lastfm_list.topartists.artist[0].name);
+
 	},
 	setLastFMArtistList: function(inSender, inEvent) {
         var index = inEvent.index;
