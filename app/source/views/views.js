@@ -91,6 +91,7 @@ enyo.kind({
 								{kind: "moon.Button", small:true, content: $L("Settings"), name:"mediumHeaderToggle", ontap: "lastfmConfigTap"}
 				],
 				components: [
+					{kind: 'enyo.Control', name: 'lastFMArtistsText', components: [ {kind: 'moon.BodyText', content: $L("No artists found.")} ] },
 					{kind: 'moon.Scroller', classes: "enyo-fill", components: [
 						{kind: "enyo.Repeater", count:"10", onSetupItem: "setLastFMArtistList", components: [
 							{
@@ -107,13 +108,19 @@ enyo.kind({
 		});
 		request.go();
 		//alert(this.lastfm_list.topartists.artist[0].name);
-
 	},
 	setLastFMArtistList: function(inSender, inEvent) {
         var index = inEvent.index;
         var item = inEvent.item;
-				item.$.imageItem.set("label", this.lastfm_list.topartists.artist[index].name);
-				item.$.imageItem.set("source", this.lastfm_list.topartists.artist[index].image[2]['#text']);
+				try {
+					item.$.imageItem.set("label", this.lastfm_list.topartists.artist[index].name);
+					item.$.imageItem.set("source", this.lastfm_list.topartists.artist[index].image[2]['#text']);
+				}catch(err) {
+						inSender.setCount(inSender.count - 1);
+				}
+				if(index == 9 && inSender.count != 0) {
+					this.$.lastFMArtistsText.hide();
+				}
         return true;
   },
 	googlemapsTap: function() {
