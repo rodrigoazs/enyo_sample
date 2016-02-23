@@ -4,5 +4,11 @@
 	"Menu": "Menu",
 	"Language": "Idioma",
 	"Enter search term above": "Digite a pesquisa abaixo",
-	"Loading": "Carregando"
+	"Loading": "Carregando",
+	"Enter username": "Digite o nome de usuário",
+	"Save": "Gravar",
+	"Name": "Nome",
+	"Country": "País",
+	"No artist found.": "Nenhum artista encontrado.",
+	"Please, type your LastFM username to establish connection.": "Por favor, digite seu nome de usuário do LastFM para iniciar uma conexão."
 }

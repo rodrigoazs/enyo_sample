@@ -12,7 +12,60 @@ enyo.kind({
 	classes: "moon enyo-fit",
 	storage: 0, // responsible for the storage
 	components: [
-		{name: "panels", kind: "moon.Panels", popOnBack:true, pattern: "alwaysviewing", classes: "enyo-fit"}
+				{name: "player", kind: "moon.VideoPlayer", src: "movies/big_buck_bunny_720p_50mb.mp4", poster: "$lib/moonstone/samples/assets/video-poster.png", autoplay: true, infoComponents: [
+			{kind: "moon.VideoInfoBackground", orient: "left", autoResize: true, background: true, fit: true, components: [
+				{
+					kind: "moon.ChannelInfo",
+					channelNo: "13",
+					channelName: "AMC",
+					classes: "moon-2h",
+					components: [
+						{content: "3D"},
+						{content: "Live"},
+						{content: "REC 08:22", classes: "moon-video-player-info-redicon "}
+					]
+				},
+				{
+					kind: "moon.VideoInfoHeader",
+					title: "Downton Abbey - Extra Title",
+					subTitle: "Mon June 21, 7:00 - 8:00pm",
+					subSubTitle: "R - TV 14, V, L, SC",
+					description: "The series, set in the Youkshire country estate of Downton Abbey, depicts the lives of the aristocratic Crawley famiry and"
+				}
+			]},
+			{kind: "moon.VideoInfoBackground", orient: "right", background: true, components: [
+				{kind:"moon.Clock"}
+			]}
+		], components: [
+			{kind: "moon.IconButton", src: "$lib/moonstone/images/video-player/icon-placeholder.png"},
+			{kind: "moon.TooltipDecorator", components: [
+				{kind: "moon.ContextualPopupDecorator", components: [
+					{kind: "moon.Button", content: "Popup"},
+					{
+						kind: "moon.ContextualPopup",
+						classes: "moon-3h moon-6v",
+						components: [
+							{kind: "moon.Item", content:"Item 1"},
+							{kind: "moon.Item", content:"Item 2"},
+							{kind: "moon.Item", content:"Item 3"}
+						]
+					}
+				]},
+				{kind: "moon.Tooltip", floating:true, content: "I'm a tooltip for a button."}
+			]},
+			{kind: "moon.IconButton", classes:"moon-icon-video-round-controls-style"},
+			{kind: "moon.IconButton", classes:"moon-icon-video-round-controls-style"},
+			{kind: "moon.IconButton", classes:"moon-icon-video-round-controls-style"},
+			{kind: "moon.IconButton", classes:"moon-icon-video-round-controls-style"},
+			{kind: "moon.IconButton", classes:"moon-icon-video-round-controls-style"},
+			{kind: "moon.IconButton", classes:"moon-icon-video-round-controls-style"},
+			{kind: "moon.IconButton", classes:"moon-icon-video-round-controls-style"},
+			{kind: "moon.IconButton", classes:"moon-icon-video-round-controls-style"},
+			{kind: "moon.IconButton", classes:"moon-icon-video-round-controls-style"}
+		]},
+		// {kind: "PanelsWithCarouselArrangerSample"},
+		{kind: "moon.Spinner", name: "spinner"},
+		{name: "panels", kind: "moon.Panels",	popOnBack:true, pattern: "alwaysviewing", classes: "enyo-fit"}
 	],
 	constructor: function() {
 		// read the storage before loading and then call the Menu
@@ -34,6 +87,7 @@ enyo.kind({
     this.inherited(arguments);
 	},
 	showMenu: function () {
+		this.$.spinner.stop();
 		this.inherited(arguments);
 		this.$.panels.pushPanels([
 			{title: "Menu", autoNumber: false, smallHeader: true, headerType: 'small', name: "MenuPanel", defaultSpotlightControl: "defaultControl", classes: "moon-7h", joinToPrev: true, components: [
@@ -43,6 +97,9 @@ enyo.kind({
 				{kind: "moon.Item", name: "SettingsItem",  content: "<img src='http://icons.iconarchive.com/icons/graphicloads/100-flat-2/256/settings-icon.png' width='20px'> "+$L('Settings'), allowHtml: true, ontap: "next2"}
 			]}
 		], {owner: this});
+	},
+	next1: function() {
+		this.$.panels.pushPanels([],{owner: this});
 	},
 	next2: function() {
 		this.$.panels.pushPanels([
@@ -78,6 +135,7 @@ enyo.kind({
 		return true;
 	},
 	lastfmTap: function() {
+		this.$.spinner.start();
 		var request = new enyo.Ajax({url: "http://ws.audioscrobbler.com/2.0/?method=user.gettopartists&limit=10&user="+this.storage.lastfm_user+"&api_key=2b35547bd5675d8ecb2b911ee9901f59&format=json"});
 		request.response(this, function(inSender, inData) {
 			this.lastfm_list = inData;
@@ -88,10 +146,10 @@ enyo.kind({
 				{name: "LastFMPanel", title: "<img src='http://perfectprog.com/pics/lastfm/lastfm-icon.png' width='50px'> LastFM", titleUpperCase: false, allowHtmlHeader: true, autoNumber: false, smallHeader: true, headerType: 'small', defaultSpotlightControl: "defaultControl", classes: "moon-7h", joinToPrev: true,
 				data: null,
 				headerComponents: [
-								{kind: "moon.Button", small:true, content: $L("Settings"), name:"mediumHeaderToggle", ontap: "lastfmConfigTap"}
+							{kind: "moon.Button", small:true, content: $L("Settings"), name:"mediumHeaderToggle", ontap: "lastfmConfigTap"}
 				],
 				components: [
-					{kind: 'enyo.Control', name: 'lastFMArtistsText', components: [ {kind: 'moon.BodyText', content: $L("No artists found.")} ] },
+					{kind: 'enyo.Control', name: 'lastFMArtistsText', components: [ {kind: 'moon.BodyText', content: $L("No artist found.")} ] },
 					{kind: 'moon.Scroller', classes: "enyo-fill", components: [
 						{kind: "enyo.Repeater", count:"10", onSetupItem: "setLastFMArtistList", components: [
 							{
@@ -105,6 +163,7 @@ enyo.kind({
 				]
 				}
 			],{owner: this});
+			this.$.spinner.stop();
 		});
 		request.go();
 		//alert(this.lastfm_list.topartists.artist[0].name);
@@ -161,7 +220,7 @@ enyo.kind({
 		this.$.panels.pushPanels([
 			{title: $L("Settings"), titleUpperCase: false, allowHtmlHeader: true, autoNumber: false, smallHeader: true, headerType: 'small', defaultSpotlightControl: "defaultControl", classes: "moon-7h", joinToPrev: true,
 			components: [
-				{kind: "moon.BodyText", content: "Please, type your LastFM username to establish connection."},
+				{kind: "moon.BodyText", content: $L("Please, type your LastFM username to establish connection.")},
 				{kind: "moon.InputDecorator", components: [
 					{kind: "moon.Input", name: "lastfmUserInput", placeholder: $L("Enter username"), value: this.storage.lastfm_user, oninput:"handleInput", onchange:"handleChange"}
 				]},
@@ -171,7 +230,7 @@ enyo.kind({
 				// 	{kind: "moon.Input", type:"password", placeholder: $L("Enter password"), oninput: "handleInput", onchange:"handleChange"}
 				// ]},
 				{kind: "moon.InputDecorator", components: [
-					{name: "bButton", kind: "moon.Button", content: $L("Save"), ontap: "lastfmConfigButtonTap"}
+					{name: "bButton", kind: "moon.Button", content: $L("Save"), Spotlight: true, ontap: "lastfmConfigButtonTap"}
 				]},
 				{tag: "br"},
 				{tag: "br"},
@@ -246,5 +305,67 @@ enyo.kind({
 	},
 	googlemaphandleInput: function(inSender, inEvent) {
 		localizeAddres(this.map, inSender.getValue());
+	}
+});
+
+enyo.kind({
+	name: "PanelsWithCarouselArrangerSample",
+	classes: "moon enyo-fit",
+	components: [
+		{name: "panels", kind: "moon.Panels", style:"opacity: 0.9;", pattern: "activity", classes: "enyo-fit", useHandle: true, components: [
+			{title: "First", components: [
+				{kind: "moon.Item", content: "Item One", ontap: "next"},
+				{kind: "moon.Item", content: "Item Two", ontap: "next"},
+				{kind: "moon.Item", content: "Item Three", ontap: "next"},
+				{kind: "moon.Item", content: "Item Four", ontap: "next"},
+				{kind: "moon.Item", content: "Item Five", ontap: "next"}
+			]},
+			{title: "Second", components: [
+				{kind: "moon.Item", content: "Item One", ontap: "next"},
+				{kind: "moon.Item", content: "Item Two", ontap: "next"},
+				{kind: "moon.Item", content: "Item Three", ontap: "next"},
+				{kind: "moon.Item", content: "Item Four", ontap: "next"},
+				{kind: "moon.Item", content: "Item Five", ontap: "next"}
+			]},
+			{title: "Third", components: [
+				{kind: "moon.Item", content: "Item One", ontap: "next"},
+				{kind: "moon.Item", content: "Item Two", ontap: "next"},
+				{kind: "moon.Item", content: "Item Three", ontap: "next"},
+				{kind: "moon.Item", content: "Item Four", ontap: "next"},
+				{kind: "moon.Item", content: "Item Five", ontap: "next"}
+			]},
+			{title: "Fourth", components: [
+				{kind: "moon.Item", content: "Item One", ontap: "next"},
+				{kind: "moon.Item", content: "Item Two", ontap: "next"},
+				{kind: "moon.Item", content: "Item Three", ontap: "next"},
+				{kind: "moon.Item", content: "Item Four", ontap: "next"},
+				{kind: "moon.Item", content: "Item Five", ontap: "next"}
+			]},
+			{title: "Fifth", components: [
+				{kind: "moon.Item", content: "Item One", ontap: "next"},
+				{kind: "moon.Item", content: "Item Two", ontap: "next"},
+				{kind: "moon.Item", content: "Item Three", ontap: "next"},
+				{kind: "moon.Item", content: "Item Four", ontap: "next"},
+				{kind: "moon.Item", content: "Item Five", ontap: "next"}
+			]},
+			{title: "Sixth", components: [
+				{kind: "moon.Item", content: "Item One", ontap: "next"},
+				{kind: "moon.Item", content: "Item Two", ontap: "next"},
+				{kind: "moon.Item", content: "Item Three", ontap: "next"},
+				{kind: "moon.Item", content: "Item Four", ontap: "next"},
+				{kind: "moon.Item", content: "Item Five", ontap: "next"}
+			]},
+			{title: "Seventh", components: [
+				{kind: "moon.Item", content: "Item One"},
+				{kind: "moon.Item", content: "Item Two"},
+				{kind: "moon.Item", content: "Item Three"},
+				{kind: "moon.Item", content: "Item Four"},
+				{kind: "moon.Item", content: "Item Five"}
+			]}
+		]}
+	],
+	next: function(inSender, inEvent) {
+		this.$.panels.next();
+		return true;
 	}
 });
