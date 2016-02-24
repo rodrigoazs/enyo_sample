@@ -27,6 +27,7 @@ enyo.kind({
 				},
 				{
 					kind: "moon.VideoInfoHeader",
+					name: "playerInfo",
 					title: "Downton Abbey - Extra Title",
 					subTitle: "Mon June 21, 7:00 - 8:00pm",
 					subSubTitle: "R - TV 14, V, L, SC",
@@ -65,6 +66,25 @@ enyo.kind({
 		]},
 		// {kind: "PanelsWithCarouselArrangerSample"},
 		{kind: "moon.Spinner", name: "spinner"},
+		{kind: "enyo.Control", name: "onDemandPanel", showing: false, tag: "div", style: "height: 100%; width: 100%; z-index: 9999; position: fixed; background-color: rgba(0, 0, 0, 0.75);", components: [
+			{kind:"moon.IconButton", name: "locVoltar", icon: "arrowlargeleft", ontap:"voltar", onSpotlightSelect: "voltar", style: "margin: 50px 20px 0 0;"},
+			{kind: "moon.Scroller", fit:true, components: [
+				{kind: "Repeater", count:9, classes:"moon-hspacing", onSetupItem:"setupItemMovies", components: [
+					{
+						kind: "moon.ObjectActionDecorator",
+						orientation: "vertical",
+						components: [
+							{kind: "moon.Item", onSpotlightFocused: "MovieFocused", components: [
+								{name: 'image', kind: 'enyo.Image', style: "height: 338px", src: "http://cdn.fansided.com/wp-content/blogs.dir/229/files/2015/12/4954724-deadpool-camp-b-one-sheet1-590x900.jpg"}
+							]}
+						],
+						actionComponents: [
+							{kind: "moon.Button", onSpotlightFocused: "MovieFocused", onSpotlightSelect: "chooseMovPlay", ontap: "chooseMovPlay", small: true, content: "PLAY"}
+						]
+					}
+				]}
+			]}
+		]},
 		{name: "panels", kind: "moon.Panels",	popOnBack:true, pattern: "alwaysviewing", classes: "enyo-fit"}
 	],
 	constructor: function() {
@@ -91,15 +111,70 @@ enyo.kind({
 		this.inherited(arguments);
 		this.$.panels.pushPanels([
 			{title: "Menu", autoNumber: false, smallHeader: true, headerType: 'small', name: "MenuPanel", defaultSpotlightControl: "defaultControl", classes: "moon-7h", joinToPrev: true, components: [
-				{kind: "moon.Item", name: "FlickrSearchItem", content: $L('Flickr Search'), ontap: "next1"},
+				{kind: "moon.Item", name: "FlickrSearchItem", content: "<img src='https://www.aryanict.com/upload/1436624800877.png' width='20px'> onDemand", allowHtml: true, ontap: "next1"},
 				{kind: "moon.Item", name: "LastFMItem",  content: "<img src='http://perfectprog.com/pics/lastfm/lastfm-icon.png' width='20px'> LastFM", allowHtml: true, ontap: "lastfmTap"},
 				{kind: "moon.Item", name: "GoogleMapsItem",  content: "<img src='http://www.juliesalva.com/wp-content/uploads/2015/03/Google_Maps_Icon.png' width='20px'> GoogleMaps", allowHtml: true, ontap: "googlemapsTap"},
 				{kind: "moon.Item", name: "SettingsItem",  content: "<img src='http://icons.iconarchive.com/icons/graphicloads/100-flat-2/256/settings-icon.png' width='20px'> "+$L('Settings'), allowHtml: true, ontap: "next2"}
 			]}
 		], {owner: this});
 	},
+	MovieFocused: function(inSender, inEvent) {
+		for(var i=0; i < inSender.count; i++)
+		{
+			if(i == inEvent.index)
+				inSender.children[i].$.image.set("style", "height: 400px");
+			else
+				inSender.children[i].$.image.set("style", "height: 300px");
+		}
+	},
+	chooseMovPlay: function(inSender, inEvent) {
+		var data_ar = [{title:"Deadpool", duration:90, description: "Ex-militar e mercenário, Wade Wilson (Ryan Reynolds) é diagnosticado com câncer em estado terminal, porém encontra uma possibilidade de cura em uma sinistra experiência científica. Recuperado, com poderes e um incomum senso de humor, ele torna-se Deadpool e busca vingança contra o homem que destruiu sua vida."},
+									{title:"Frozen", duration:90, description: "A cacula Anna adora sua irma Elsa, mas um acidente envolvendo os poderes especiais da mais velha, durante a infancia, fez com que os pais as mantivessem afastadas. Apos a morte deles, as duas cresceram isoladas no castelo da familia, ate o dia em que Elsa deveria assumir o reinado de Arendell.."},
+									{title:"O Senhor dos Anéis", duration:170, description: "Numa terra fantástica e única, chamada Terra-Média, um hobbit (seres de estatura entre 80 cm e 1,20 m, com pés peludos e bochechas um pouco avermelhadas) recebe de presente de seu tio o Um Anel, um anel mágico e maligno que precisa ser destruído antes que caia nas mãos do mal."},
+									{title:"Espetacular Homem-Aranha", duration:130, description: "Peter Parker é um rapaz tímido e estudioso, que inicou há pouco tempo um namoro com a bela Gwen Stacy. Certo dia, o jovem encontra uma misteriosa maleta que pertenceu a seu pai. O artefato faz com que visite o laboratório do dr. Curt Connors. Parker está em busca de respostas sobre o que aconteceu com os pais.."},
+									{title:"Star Wars: O Império Contra Ataca", duration:120, description: "Luke Skywalker (Mark Hammil) sonha ir para a Academia como seus amigos, mas se ve envolvido em uma guerra intergalatica quando seu tio compra dois robos e com eles encontra uma mensagem da princesa Leia Organa (Carrie Fisher) para o jedi Obi-Wan Kenobi (Alec Guiness) sobre os planos da construcao da Estrela da Morte.."},
+									{title:"Star Wars: Uma Nova Esperança", duration:120, description: "Luke Skywalker, viaja para o misterioso planeta pantanoso de Dagobah, onde o sabio Mestre Jedi Yoda, ensina ao jovem heroi os caminhos da Forca. O que Luke, nao pode imaginar e que seu treinamento Jedi, sera necessario muito em breve.."}];
+
+		this.$.playerInfo.set("title", data_ar[inEvent.index].title);
+		this.$.playerInfo.set("subTitle", data_ar[inEvent.index].duration + " mins");
+		this.$.playerInfo.set("description", data_ar[inEvent.index].description);
+
+		this.$.player.setSrc("movies/"+inEvent.index+".mp4");
+		this.$.player.play();
+		this.$.onDemandPanel.hide();
+		this.$.onDemandPanel.blur();
+		this.$.panels.set("handleShowing", true);
+	},
+	setupItemMovies: function(inSender, inEvent) {
+		var data_ar = ["http://cdn.fansided.com/wp-content/blogs.dir/229/files/2015/12/4954724-deadpool-camp-b-one-sheet1-590x900.jpg",
+									 "http://vignette4.wikia.nocookie.net/disney/images/e/e5/Frozen_movie_poster.jpg/revision/latest?cb=20141231225644",
+									 "http://br.web.img2.acsta.net/medias/nmedia/18/92/34/89/20194741.jpg",
+									 "http://cdn.collider.com/wp-content/uploads/amazing-spider-man-movie-poster.jpg",
+									 "http://photos.imageevent.com/afap/wallpapers/movies/theempirestrikesback/The-Empire-Strikes-Back%20-%20DVD.jpg",
+									 "https://i.kinja-img.com/gawker-media/image/upload/kiq87p17yfydl5qee12r.jpg"];
+
+		//this.$.image.set("src", "http://www.owlkids.com/wp-content/uploads/2014/08/Teenage-Mutant-Ninja-Turtles-2014-Movie-Poster.jpg");
+		//alert('a');
+		inSender.children[inEvent.index].$.image.set("src", data_ar[inEvent.index]);
+		var a = inSender;
+	},
 	next1: function() {
-		this.$.panels.pushPanels([],{owner: this});
+		// this.$.panels.pushPanels([
+		// 	{title: "<img src='http://icons.iconarchive.com/icons/graphicloads/100-flat-2/256/settings-icon.png' width='50px'> "+$L("onDEMAND"), titleUpperCase: false, allowHtmlHeader: true, autoNumber: false, smallHeader: true, headerType: 'small', defaultSpotlightControl: "defaultControl", classes: "moon-7h", joinToPrev: true, components: [
+		// 		{tag: "div", style: "width: 200px; z-index: 9999; position: absolute; left: -50px; background-color: red;", content: "hehehe" }
+		// 	]}
+		// ],{owner: this});
+		this.$.panels.set("handleShowing", false);
+		this.$.panels.hide();
+		this.$.onDemandPanel.show();
+		this.$.onDemandPanel.focus();
+	},
+	voltar: function()
+	{
+		this.$.onDemandPanel.hide();
+		this.$.onDemandPanel.blur();
+		this.$.panels.set("handleShowing", true);
+		this.$.panels.show();
 	},
 	next2: function() {
 		this.$.panels.pushPanels([
